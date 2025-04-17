@@ -9,17 +9,16 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('parts', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->integer('price');
+            $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->text('description')->nullable();
-            $table->decimal('price', 10, 2);
-            $table->unsignedBigInteger('category_id');
+            $table->string('image')->nullable(); // ruta de la imagen
             $table->timestamps();
-    
-            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
         });
     }
 
