@@ -14,12 +14,16 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:6',
+            'birthdate' => 'required|date|before_or_equal:' . now()->subYears(5)->toDateString(), // opcionalmente puedes validar edad mínima
+            'phone' => 'required|string',
+            'password' => 'required|string|min:6|max:16',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'birthdate' => $request->birthdate,
+            'phone' => $request->phone,
             'password' => Hash::make($request->password),
         ]);
 
@@ -27,6 +31,7 @@ class AuthController extends Controller
 
         return response()->json(compact('user', 'token'), 201);
     }
+
 
     public function login(Request $request)
     {
