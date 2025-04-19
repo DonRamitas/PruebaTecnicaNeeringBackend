@@ -7,10 +7,23 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Category::all();
+        $query = Category::query();
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where('name', 'like', "%$search%");
+        }
+
+        return response()->json($query->paginate(10));
     }
+
+    public function all()
+    {
+        return response()->json(Category::all());
+    }
+
 
     public function store(Request $request)
     {
