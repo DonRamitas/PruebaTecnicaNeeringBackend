@@ -9,17 +9,17 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('parts', function (Blueprint $table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->integer('price');
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->text('description')->nullable();
-            $table->string('image')->nullable(); // ruta de la imagen
+            $table->string('image')->nullable();
             $table->timestamps();
-        });
+        });        
     }
 
     /**
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('parts');
+        Schema::dropIfExists('products');
     }
 };
