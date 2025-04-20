@@ -33,8 +33,8 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|string|max:100',
             'price' => 'required|integer|max:100000000',
-            'category_id' => 'required|exists:categories,id',
-            'description' => 'required|string|max:1000',
+            'category_id' => 'nullable|exists:categories,id',
+            'description' => 'nullable|string|max:300',
             'image' => 'nullable|image|max:10240',
         ]);
 
@@ -71,7 +71,7 @@ class ProductController extends Controller
             'name' => 'required|string|max:100',
             'price' => 'required|integer|max:100000000',
             'category_id' => 'required|exists:categories,id',
-            'description' => 'required|string|max:1000',
+            'description' => 'nullable|string|max:300',
             'image' => 'nullable|image|max:10240',
         ]);
 
