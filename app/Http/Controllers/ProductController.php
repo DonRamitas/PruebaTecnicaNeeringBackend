@@ -71,10 +71,17 @@ class ProductController extends Controller
             'price' => 'sometimes|required|integer|max:100000000',
             'category_id' => 'sometimes|nullable|exists:categories,id',
             'description' => 'sometimes|nullable|string|max:300',
-            'image' => 'sometimes|image|max:10240',
+            'image' => 'sometimes|nullable|image|max:10240',
         ]);
         
         \Log::info('Datos validados:', $validated);
+
+        if ($request->has('remove_image') && $request->remove_image === 'true') {
+            if ($product->image) {
+                Storage::delete($product->image); // elimina el archivo
+                $product->image = null;           // borra referencia
+            }
+        }
 
         // Procesar imagen si viene una nueva
         if ($request->hasFile('image')) {
