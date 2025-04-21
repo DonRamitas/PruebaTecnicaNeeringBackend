@@ -62,32 +62,46 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
-
-        if (!$request->hasFile('image') && !$request->has(['name', 'price', 'category_id', 'description'])) {
-            return response()->json(['message' => 'No se enviaron datos para actualizar'], 422);
-        }
-
-        $request->validate([
-            'name' => 'required|string|max:100',
-            'price' => 'required|integer|max:100000000',
-            'category_id' => 'required|exists:categories,id',
-            'description' => 'nullable|string|max:300',
-            'image' => 'nullable|image|max:10240',
+        // Primero, verifica qué valores llegan
+        \Log::info('Datos recibidos:', $request->all());
+        
+        // Validación
+        $validated = $request->validate([
+            'name' => 'sometimes|required|string|max:100',
+            'price' => 'sometimes|required|integer|max:100000000',
+            'category_id' => 'sometimes|nullable|exists:categories,id',
+            'description' => 'sometimes|nullable|string|max:300',
+            'image' => 'sometimes|image|max:10240',
         ]);
+        
+        \Log::info('Datos validados:', $validated);
 
+        // Procesar imagen si viene una nueva
         if ($request->hasFile('image')) {
+            // Eliminar imagen anterior
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
             }
 
+            // Guardar nueva imagen
             $imagePath = $request->file('image')->store('products', 'public');
-            $product->image = $imagePath;
+            $validated['image'] = $imagePath; // Añadir al array validado
         }
 
-        $product->update($request->only(['name', 'price', 'category_id', 'description']));
+        // Actualizar cada campo explícitamente
+        foreach ($validated as $field => $value) {
+            $product->{$field} = $value;
+        }
+
+        // Guardar cambios
+        $product->save();
+        
+        \Log::info('Producto después de guardar:', $product->toArray());
 
         return response()->json($product);
     }
+
+
 
     public function destroy(Product $product)
     {
