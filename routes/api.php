@@ -12,6 +12,11 @@ use App\Http\Controllers\CategoryController;
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 
+// Ping
+Route::get('ping', function () {
+    return response()->json(['message' => 'pong'], 200);
+});
+
 // Rutas protegidas por autenticación JWT
 Route::middleware('auth:api')->group(function () {
     // Obtener usuario actual
