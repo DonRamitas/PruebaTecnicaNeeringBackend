@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;//
+namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+// Gestiona el CRUD de los productos
 class ProductController extends Controller
 {
+    // Retorna un array de productos según un término de búsqueda y una categoría específica
     public function index(Request $request)
     {
         $query = Product::with('category');
@@ -28,6 +30,7 @@ class ProductController extends Controller
         return response()->json($products);
     }
 
+    // Valida y almacena un producto específico
     public function store(Request $request)
     {
         $request->validate([
@@ -55,17 +58,16 @@ class ProductController extends Controller
         return response()->json($product, 201);
     }
 
+    // Obtiene un producto en específico
     public function show(Product $product)
     {
         return response()->json($product->load('category'));
     }
 
+    // Actualiza un producto
     public function update(Request $request, Product $product)
     {
-        // Primero, verifica qué valores llegan
-        \Log::info('Datos recibidos:', $request->all());
-        
-        // Validación
+        // Valida los datos
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:100',
             'price' => 'sometimes|required|integer|max:100000000',
@@ -73,43 +75,39 @@ class ProductController extends Controller
             'description' => 'sometimes|nullable|string|max:300',
             'image' => 'sometimes|nullable|image|max:10240',
         ]);
-        
-        \Log::info('Datos validados:', $validated);
 
+        // Elimina una imagen si trae el flag
         if ($request->has('remove_image') && $request->remove_image === 'true') {
             if ($product->image) {
-                Storage::delete($product->image); // elimina el archivo
-                $product->image = null;           // borra referencia
+                Storage::delete($product->image);
+                $product->image = null;
             }
         }
 
-        // Procesar imagen si viene una nueva
+        // Procesa imagen si viene una nueva y la almacena
         if ($request->hasFile('image')) {
-            // Eliminar imagen anterior
+
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
             }
 
-            // Guardar nueva imagen
             $imagePath = $request->file('image')->store('products', 'public');
-            $validated['image'] = $imagePath; // Añadir al array validado
+            $validated['image'] = $imagePath;
         }
 
-        // Actualizar cada campo explícitamente
+        // Actualizar cada campo modificado
         foreach ($validated as $field => $value) {
             $product->{$field} = $value;
         }
 
         // Guardar cambios
         $product->save();
-        
-        \Log::info('Producto después de guardar:', $product->toArray());
 
+        // Retorna el producto ya modificado
         return response()->json($product);
     }
 
-
-
+    // Elimina un producto
     public function destroy(Product $product)
     {
         if ($product->image) {

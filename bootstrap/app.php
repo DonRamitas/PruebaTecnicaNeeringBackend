@@ -10,7 +10,7 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
-    )
+    )// Aquí se aplica el Middleware
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'auth' => \App\Http\Middleware\Authenticate::class,

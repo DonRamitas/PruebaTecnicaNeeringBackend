@@ -1,5 +1,7 @@
 <?php
 
+// Modelo de usuario
+
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -16,7 +18,7 @@ class User extends Authenticatable implements JWTSubject
         'birthdate',
         'phone',
         'password',
-        'profile_image',
+        'profile_image', //No se utiliza
     ];
 
     protected $hidden = [
@@ -24,6 +26,7 @@ class User extends Authenticatable implements JWTSubject
         'remember_token',
     ];
 
+    // Obtiene el JWT del usuario
     public function getJWTIdentifier()
     {
         return $this->getKey();
